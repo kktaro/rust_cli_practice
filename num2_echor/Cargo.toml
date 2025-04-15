@@ -1,6 +1,8 @@
 [package]
 name = "num2_echor"
 version = "0.1.0"
+descriptipon = "Rust echo"
 edition = "2024"
 
 [dependencies]
+clap = { version = "^4.5.36", features = ["derive"] }
