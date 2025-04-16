@@ -15,5 +15,8 @@ struct Cli {
 
 fn main() {
     let args = Cli::parse();
-    println!("{:#?}", args);
+    let texts = args.text.join(" ");
+    let ending = if args.newline { "" } else { "\n" };
+
+    print!("{}{}", texts, ending);
 }
