@@ -2,10 +2,10 @@ use anyhow::Result;
 use assert_cmd::Command;
 use predicates::prelude::*;
 use pretty_assertions::assert_eq;
-use rand::{distributions::Alphanumeric, Rng};
+use rand::{distr::Alphanumeric, Rng};
 use std::fs;
 
-const PRG: &str = "catr";
+const PRG: &str = "num3_catr";
 const EMPTY: &str = "tests/inputs/empty.txt";
 const FOX: &str = "tests/inputs/fox.txt";
 const SPIDERS: &str = "tests/inputs/spiders.txt";
@@ -26,7 +26,7 @@ fn usage() -> Result<()> {
 // --------------------------------------------------
 fn gen_bad_file() -> String {
     loop {
-        let filename: String = rand::thread_rng()
+        let filename: String = rand::rng()
             .sample_iter(&Alphanumeric)
             .take(7)
             .map(char::from)
