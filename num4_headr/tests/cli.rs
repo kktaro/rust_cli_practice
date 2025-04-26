@@ -1,86 +1,87 @@
-// use anyhow::Result;
-// use assert_cmd::Command;
-// use predicates::prelude::*;
-// use pretty_assertions::assert_eq;
-// use rand::{distributions::Alphanumeric, Rng};
-// use std::fs::{self, File};
-// use std::io::prelude::*;
+use anyhow::Result;
+use assert_cmd::Command;
+use predicates::prelude::*;
+use pretty_assertions::assert_eq;
+use rand::distr::Alphanumeric;
+use rand::Rng;
+use std::fs::{self, File};
+use std::io::prelude::*;
 
-// const PRG: &str = "headr";
-// const EMPTY: &str = "./tests/inputs/empty.txt";
-// const ONE: &str = "./tests/inputs/one.txt";
-// const TWO: &str = "./tests/inputs/two.txt";
-// const THREE: &str = "./tests/inputs/three.txt";
-// const TWELVE: &str = "./tests/inputs/twelve.txt";
+const PRG: &str = "num4_headr";
+const EMPTY: &str = "./tests/inputs/empty.txt";
+const ONE: &str = "./tests/inputs/one.txt";
+const TWO: &str = "./tests/inputs/two.txt";
+const THREE: &str = "./tests/inputs/three.txt";
+const TWELVE: &str = "./tests/inputs/twelve.txt";
 
-// // --------------------------------------------------
-// fn random_string() -> String {
-//     rand::thread_rng()
-//         .sample_iter(&Alphanumeric)
-//         .take(7)
-//         .map(char::from)
-//         .collect()
-// }
+// --------------------------------------------------
+fn random_string() -> String {
+    rand::rng()
+        .sample_iter(&Alphanumeric)
+        .take(7)
+        .map(char::from)
+        .collect()
+}
 
-// // --------------------------------------------------
-// fn gen_bad_file() -> String {
-//     loop {
-//         let filename = random_string();
-//         if fs::metadata(&filename).is_err() {
-//             return filename;
-//         }
-//     }
-// }
+// --------------------------------------------------
+fn gen_bad_file() -> String {
+    loop {
+        let filename = random_string();
+        if fs::metadata(&filename).is_err() {
+            return filename;
+        }
+    }
+}
 
-// // --------------------------------------------------
-// #[test]
-// fn dies_bad_bytes() -> Result<()> {
-//     let bad = random_string();
-//     let expected = format!(
-//         "invalid value '{bad}' for \
-//         '--bytes <BYTES>': invalid digit found in string"
-//     );
+// --------------------------------------------------
+#[test]
+fn dies_bad_bytes() -> Result<()> {
+    let bad = random_string();
+    let expected = format!(
+        "invalid value '{bad}' for \
+        '--bytes <BYTES>': invalid digit found in string"
+    );
 
-//     Command::cargo_bin(PRG)?
-//         .args(["-c", &bad, EMPTY])
-//         .assert()
-//         .failure()
-//         .stderr(predicate::str::contains(expected));
+    Command::cargo_bin(PRG)?
+        .args(["-c", &bad, EMPTY])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains(expected));
 
-//     Ok(())
-// }
+    Ok(())
+}
 
-// // --------------------------------------------------
-// #[test]
-// fn dies_bad_lines() -> Result<()> {
-//     let bad = random_string();
-//     let expected = format!(
-//         "error: invalid value '{bad}' for \
-//         '--lines <LINES>': invalid digit found in string"
-//     );
-//     Command::cargo_bin(PRG)?
-//         .args(["-n", &bad, EMPTY])
-//         .assert()
-//         .failure()
-//         .stderr(predicate::str::contains(expected));
+// --------------------------------------------------
+#[test]
+fn dies_bad_lines() -> Result<()> {
+    let bad = random_string();
+    let expected = format!(
+        "error: invalid value '{bad}' for \
+        '--lines <LINES>': invalid digit found in string"
+    );
+    Command::cargo_bin(PRG)?
+        .args(["-n", &bad, EMPTY])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains(expected));
 
-//     Ok(())
-// }
+    Ok(())
+}
 
-// // --------------------------------------------------
-// #[test]
-// fn dies_bytes_and_lines() -> Result<()> {
-//     let msg = "the argument '--lines <LINES>' cannot be \
-//                used with '--bytes <BYTES>'";
+// --------------------------------------------------
+#[test]
+fn dies_bytes_and_lines() -> Result<()> {
+    let msg = "the argument '--lines <LINES>' cannot be \
+               used with '--bytes <BYTES>'";
 
-//     Command::cargo_bin(PRG)?
-//         .args(["-n", "1", "-c", "2"])
-//         .assert()
-//         .failure()
-//         .stderr(predicate::str::contains(msg));
+    Command::cargo_bin(PRG)?
+        .args(["-n", "1", "-c", "2"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains(msg));
 
-//     Ok(())
-// }
+    Ok(())
+}
 
 // // --------------------------------------------------
 // #[test]
