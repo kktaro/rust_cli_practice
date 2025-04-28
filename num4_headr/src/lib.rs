@@ -5,6 +5,7 @@ use clap::{ArgGroup, Parser};
 type MyResult<T> = Result<T, Box<dyn Error>>;
 
 #[derive(Debug)]
+#[allow(dead_code)]
 pub struct Config {
     files: Vec<String>,
     lines: usize,
@@ -12,7 +13,7 @@ pub struct Config {
 }
 
 pub fn get_args() -> MyResult<Config> {
-    let args = Args::parse();
+    let args = Cli::parse();
     Ok(Config {
         files: args.files,
         lines: args.lines,
@@ -28,8 +29,8 @@ pub fn run(config: Config) -> MyResult<()> {
 #[derive(Parser, Debug)]
 #[command(version)]
 #[command(about = "Rust head")]
-#[command(group(ArgGroup::new("inputs").required(true).args(["lines", "bytes"])))]
-struct Args {
+#[command(group(ArgGroup::new("inputs").args(["lines", "bytes"])))]
+struct Cli {
     /// Target files.
     #[arg(num_args = 1.., default_values_t = ["-".to_string()])]
     files: Vec<String>,
@@ -43,6 +44,7 @@ struct Args {
     bytes: Option<usize>,
 }
 
+#[allow(dead_code)]
 fn parse_positive_int(val: &str) -> MyResult<usize> {
     match val.parse() {
         Ok(n) if n > 0 => Ok(n),
