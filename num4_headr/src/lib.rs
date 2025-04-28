@@ -1,4 +1,8 @@
-use std::{error::Error, f32::consts::E, ptr::null};
+use std::{
+    error::Error,
+    fs::File,
+    io::{self, BufRead, BufReader},
+};
 
 use clap::{ArgGroup, Parser};
 
@@ -22,7 +26,12 @@ pub fn get_args() -> MyResult<Config> {
 }
 
 pub fn run(config: Config) -> MyResult<()> {
-    println!("{:#?}", config);
+    for file_name in config.files {
+        match open(&file_name) {
+            Err(err) => eprintln!("{}: {}", file_name, err),
+            Ok(_) => println!("Opened {}", file_name),
+        }
+    }
     Ok(())
 }
 
@@ -49,6 +58,13 @@ fn parse_positive_int(val: &str) -> MyResult<usize> {
     match val.parse() {
         Ok(n) if n > 0 => Ok(n),
         _ => Err(From::from(val)),
+    }
+}
+
+fn open(file_name: &str) -> MyResult<Box<dyn BufRead>> {
+    match file_name {
+        "-" => Ok(Box::new(BufReader::new(io::stdin()))),
+        _ => Ok(Box::new(BufReader::new(File::open(file_name)?))),
     }
 }
 

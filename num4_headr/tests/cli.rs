@@ -83,18 +83,18 @@ fn dies_bytes_and_lines() -> Result<()> {
     Ok(())
 }
 
-// // --------------------------------------------------
-// #[test]
-// fn skips_bad_file() -> Result<()> {
-//     let bad = gen_bad_file();
-//     let expected = format!("{bad}: .* [(]os error 2[)]");
-//     Command::cargo_bin(PRG)?
-//         .args([EMPTY, &bad, ONE])
-//         .assert()
-//         .stderr(predicate::str::is_match(expected)?);
+// --------------------------------------------------
+#[test]
+fn skips_bad_file() -> Result<()> {
+    let bad = gen_bad_file();
+    let expected = format!("{bad}: .* [(]os error 2[)]");
+    Command::cargo_bin(PRG)?
+        .args([EMPTY, &bad, ONE])
+        .assert()
+        .stderr(predicate::str::is_match(expected)?);
 
-//     Ok(())
-// }
+    Ok(())
+}
 
 // // --------------------------------------------------
 // fn run(args: &[&str], expected_file: &str) -> Result<()> {
