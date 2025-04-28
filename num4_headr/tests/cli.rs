@@ -96,62 +96,62 @@ fn skips_bad_file() -> Result<()> {
     Ok(())
 }
 
-// // --------------------------------------------------
-// fn run(args: &[&str], expected_file: &str) -> Result<()> {
-//     // Extra work here due to lossy UTF
-//     let mut file = File::open(expected_file)?;
-//     let mut buffer = Vec::new();
-//     file.read_to_end(&mut buffer)?;
-//     let expected = String::from_utf8_lossy(&buffer);
+// --------------------------------------------------
+fn run(args: &[&str], expected_file: &str) -> Result<()> {
+    // Extra work here due to lossy UTF
+    let mut file = File::open(expected_file)?;
+    let mut buffer = Vec::new();
+    file.read_to_end(&mut buffer)?;
+    let expected = String::from_utf8_lossy(&buffer);
 
-//     let output = Command::cargo_bin(PRG)?.args(args).output().expect("fail");
-//     assert!(output.status.success());
-//     assert_eq!(String::from_utf8_lossy(&output.stdout), expected);
+    let output = Command::cargo_bin(PRG)?.args(args).output().expect("fail");
+    assert!(output.status.success());
+    assert_eq!(String::from_utf8_lossy(&output.stdout), expected);
 
-//     Ok(())
-// }
+    Ok(())
+}
 
-// // --------------------------------------------------
-// fn run_stdin(
-//     args: &[&str],
-//     input_file: &str,
-//     expected_file: &str,
-// ) -> Result<()> {
-//     // Extra work here due to lossy UTF
-//     let mut file = File::open(expected_file)?;
-//     let mut buffer = Vec::new();
-//     file.read_to_end(&mut buffer)?;
-//     let expected = String::from_utf8_lossy(&buffer);
-//     let input = fs::read_to_string(input_file)?;
+// --------------------------------------------------
+fn run_stdin(
+    args: &[&str],
+    input_file: &str,
+    expected_file: &str,
+) -> Result<()> {
+    // Extra work here due to lossy UTF
+    let mut file = File::open(expected_file)?;
+    let mut buffer = Vec::new();
+    file.read_to_end(&mut buffer)?;
+    let expected = String::from_utf8_lossy(&buffer);
+    let input = fs::read_to_string(input_file)?;
 
-//     let output = Command::cargo_bin(PRG)?
-//         .write_stdin(input)
-//         .args(args)
-//         .output()
-//         .expect("fail");
-//     assert!(output.status.success());
-//     assert_eq!(String::from_utf8_lossy(&output.stdout), expected);
+    let output = Command::cargo_bin(PRG)?
+        .write_stdin(input)
+        .args(args)
+        .output()
+        .expect("fail");
+    assert!(output.status.success());
+    assert_eq!(String::from_utf8_lossy(&output.stdout), expected);
 
-//     Ok(())
-// }
+    Ok(())
+}
 
-// // --------------------------------------------------
-// #[test]
-// fn empty() -> Result<()> {
-//     run(&[EMPTY], "tests/expected/empty.txt.out")
-// }
+// --------------------------------------------------
+#[test]
+fn empty() -> Result<()> {
+    run(&[EMPTY], "tests/expected/empty.txt.out")
+}
 
-// // --------------------------------------------------
-// #[test]
-// fn empty_n2() -> Result<()> {
-//     run(&[EMPTY, "-n", "2"], "tests/expected/empty.txt.n2.out")
-// }
+// --------------------------------------------------
+#[test]
+fn empty_n2() -> Result<()> {
+    run(&[EMPTY, "-n", "2"], "tests/expected/empty.txt.n2.out")
+}
 
-// // --------------------------------------------------
-// #[test]
-// fn empty_n4() -> Result<()> {
-//     run(&[EMPTY, "-n", "4"], "tests/expected/empty.txt.n4.out")
-// }
+// --------------------------------------------------
+#[test]
+fn empty_n4() -> Result<()> {
+    run(&[EMPTY, "-n", "4"], "tests/expected/empty.txt.n4.out")
+}
 
 // // --------------------------------------------------
 // #[test]

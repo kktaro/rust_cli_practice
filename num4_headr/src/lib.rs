@@ -26,10 +26,32 @@ pub fn get_args() -> MyResult<Config> {
 }
 
 pub fn run(config: Config) -> MyResult<()> {
+    let mut is_first_file = true;
     for file_name in config.files {
         match open(&file_name) {
             Err(err) => eprintln!("{}: {}", file_name, err),
-            Ok(_) => println!("Opened {}", file_name),
+            Ok(read_buf) => {
+                // 二つ目以降の出力の場合は空行を空ける
+                if is_first_file {
+                    is_first_file = false
+                } else {
+                    println!();
+                }
+
+                let mut is_first_line = true;
+                for (line_count, line) in read_buf.lines().enumerate() {
+                    if line_count >= config.lines {
+                        break;
+                    }
+
+                    if is_first_line {
+                        println!("==> {} <==", file_name);
+                        is_first_line = false;
+                    }
+
+                    println!("{}", line?);
+                }
+            }
         }
     }
     Ok(())
