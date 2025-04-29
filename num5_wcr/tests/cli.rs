@@ -1,42 +1,47 @@
-// use anyhow::Result;
-// use assert_cmd::Command;
-// use predicates::prelude::*;
-// use pretty_assertions::assert_eq;
-// use rand::{distributions::Alphanumeric, Rng};
-// use std::fs;
+use anyhow::{Ok, Result};
+use assert_cmd::Command;
+use predicates::prelude::*;
+use rand::{Rng, distr::Alphanumeric};
+use std::fs;
 
-// const PRG: &str = "wcr";
-// const EMPTY: &str = "tests/inputs/empty.txt";
-// const FOX: &str = "tests/inputs/fox.txt";
-// const ATLAMAL: &str = "tests/inputs/atlamal.txt";
+const PRG: &str = "num5_wcr";
+const EMPTY: &str = "tests/inputs/empty.txt";
+const FOX: &str = "tests/inputs/fox.txt";
+const ATLAMAL: &str = "tests/inputs/atlamal.txt";
 
-// // --------------------------------------------------
-// fn gen_bad_file() -> String {
-//     loop {
-//         let filename = rand::thread_rng()
-//             .sample_iter(&Alphanumeric)
-//             .take(7)
-//             .map(char::from)
-//             .collect();
+// --------------------------------------------------
+fn gen_bad_file() -> String {
+    loop {
+        let filename = rand::rng()
+            .sample_iter(&Alphanumeric)
+            .take(7)
+            .map(char::from)
+            .collect();
 
-//         if fs::metadata(&filename).is_err() {
-//             return filename;
-//         }
-//     }
-// }
+        if fs::metadata(&filename).is_err() {
+            return filename;
+        }
+    }
+}
 
-// // --------------------------------------------------
-// #[test]
-// fn dies_chars_and_bytes() -> Result<()> {
-//     Command::cargo_bin(PRG)?
-//         .args(["-m", "-c"])
-//         .assert()
-//         .failure()
-//         .stderr(predicate::str::contains(
-//             "the argument '--chars' cannot be used with '--bytes'",
-//         ));
-//     Ok(())
-// }
+// --------------------------------------------------
+#[test]
+fn dies_chars_and_bytes() -> Result<()> {
+    Command::cargo_bin(PRG)?
+        .args(["-m", "-c"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains(
+            "the argument '--chars' cannot be used with '--bytes'",
+        ));
+    Ok(())
+}
+
+#[test]
+fn args_empty() -> Result<()> {
+    Command::cargo_bin(PRG)?.assert();
+    Ok(())
+}
 
 // // --------------------------------------------------
 // fn run(args: &[&str], expected_file: &str) -> Result<()> {
