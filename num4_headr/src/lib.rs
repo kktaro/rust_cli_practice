@@ -1,7 +1,7 @@
 use std::{
     error::Error,
     fs::File,
-    io::{self, BufRead, BufReader},
+    io::{self, BufRead, BufReader, Read},
 };
 
 use clap::{ArgGroup, Parser};
@@ -9,7 +9,6 @@ use clap::{ArgGroup, Parser};
 type MyResult<T> = Result<T, Box<dyn Error>>;
 
 #[derive(Debug)]
-#[allow(dead_code)]
 pub struct Config {
     files: Vec<String>,
     lines: usize,
@@ -43,14 +42,23 @@ pub fn run(config: Config) -> MyResult<()> {
                 if is_multiple_line {
                     println!("==> {} <==", file_name);
                 }
-                for _ in 0..config.lines {
-                    let mut line = String::new();
-                    let bytes = read_buf.read_line(&mut line)?;
 
-                    if bytes == 0 {
-                        break;
+                if let Some(bytes) = config.bytes {
+                    let mut handle = read_buf.take(bytes as u64);
+
+                    let mut buffer = vec![0; bytes];
+                    let result_bytes = handle.read(&mut buffer)?;
+                    print!("{}", String::from_utf8_lossy(&buffer[..result_bytes]));
+                } else {
+                    for _ in 0..config.lines {
+                        let mut line = String::new();
+                        let result_bytes = read_buf.read_line(&mut line)?;
+
+                        if result_bytes == 0 {
+                            break;
+                        }
+                        print!("{}", line);
                     }
-                    print!("{}", line);
                 }
             }
         }
