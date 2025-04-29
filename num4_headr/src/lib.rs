@@ -27,29 +27,30 @@ pub fn get_args() -> MyResult<Config> {
 
 pub fn run(config: Config) -> MyResult<()> {
     let mut is_first_file = true;
+    let is_multiple_line = config.files.len() > 1;
+
     for file_name in config.files {
         match open(&file_name) {
             Err(err) => eprintln!("{}: {}", file_name, err),
-            Ok(read_buf) => {
-                // 二つ目以降の出力の場合は空行を空ける
+            Ok(mut read_buf) => {
+                // 二つ目以降のファイル出力の場合は空行を空ける
                 if is_first_file {
-                    is_first_file = false
+                    is_first_file = false;
                 } else {
                     println!();
                 }
 
-                let mut is_first_line = true;
-                for (line_count, line) in read_buf.lines().enumerate() {
-                    if line_count >= config.lines {
+                if is_multiple_line {
+                    println!("==> {} <==", file_name);
+                }
+                for _ in 0..config.lines {
+                    let mut line = String::new();
+                    let bytes = read_buf.read_line(&mut line)?;
+
+                    if bytes == 0 {
                         break;
                     }
-
-                    if is_first_line {
-                        println!("==> {} <==", file_name);
-                        is_first_line = false;
-                    }
-
-                    println!("{}", line?);
+                    print!("{}", line);
                 }
             }
         }
