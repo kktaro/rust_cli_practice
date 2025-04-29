@@ -16,13 +16,30 @@ pub struct Config {
 
 pub fn get_args() -> MyResult<Config> {
     let cli = Cli::parse();
-    Ok(Config {
-        files: cli.files,
-        lines: cli.lines,
-        words: cli.words,
-        bytes: cli.count_type.bytes,
-        chars: cli.count_type.chars,
-    })
+    let has_arg = cli.count_type.is_some() || cli.lines.is_some() || cli.words.is_some();
+
+    if has_arg {
+        let count_type = cli.count_type.unwrap_or(CountType {
+            bytes: Some(false),
+            chars: Some(false),
+        });
+        Ok(Config {
+            files: cli.files,
+            lines: cli.lines.unwrap_or(false),
+            words: cli.words.unwrap_or(false),
+            bytes: count_type.bytes.unwrap_or(false),
+            chars: count_type.chars.unwrap_or(false),
+        })
+    } else {
+        // オプションが指定なしの場合はデフォルト値を渡す
+        Ok(Config {
+            files: cli.files,
+            lines: true,
+            words: true,
+            bytes: true,
+            chars: false,
+        })
+    }
 }
 
 pub fn run(config: Config) -> MyResult<()> {
@@ -39,36 +56,41 @@ struct Cli {
     files: Vec<String>,
 
     #[command(flatten)]
-    count_type: CountType,
+    count_type: Option<CountType>,
 
     /// Show line count
-    #[arg(short, long, default_value_t = true)]
-    lines: bool,
+    #[arg(short, long)]
+    lines: Option<bool>,
 
     /// Show word count
-    #[arg(short, long, default_value_t = true)]
-    words: bool,
+    #[arg(short, long)]
+    words: Option<bool>,
 }
 
 #[derive(Args, Debug)]
 #[group(multiple = false)]
 struct CountType {
     /// Show byte count
-    #[arg(short('c'), long, default_value_t = true)]
-    bytes: bool,
+    #[arg(short('c'), long)]
+    bytes: Option<bool>,
 
     /// Show character count
-    #[arg(short('m'), long, default_value_t = false)]
-    chars: bool,
+    #[arg(short('m'), long)]
+    chars: Option<bool>,
 }
 
 #[cfg(test)]
 mod test {
+    use anyhow::{Ok, Result};
+
     use super::*;
 
     #[test]
-    fn args_verify() {
+    fn args_verify() -> Result<()> {
         use clap::CommandFactory;
-        Cli::command().debug_assert()
+        Cli::command().debug_assert();
+        Ok(())
     }
+
+    // TODO: Cli => Configするテストを書く
 }
