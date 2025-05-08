@@ -16,30 +16,34 @@ pub struct Config {
 
 pub fn get_args() -> MyResult<Config> {
     let cli = Cli::parse();
-    let has_arg = cli.count_type.is_some() || cli.lines.is_some() || cli.words.is_some();
 
-    if has_arg {
-        let count_type = cli.count_type.unwrap_or(CountType {
-            bytes: Some(false),
-            chars: Some(false),
-        });
-        Ok(Config {
-            files: cli.files,
-            lines: cli.lines.unwrap_or(false),
-            words: cli.words.unwrap_or(false),
-            bytes: count_type.bytes.unwrap_or(false),
-            chars: count_type.chars.unwrap_or(false),
-        })
+    let is_args_empty = [
+        cli.lines,
+        cli.words,
+        cli.count_type.bytes,
+        cli.count_type.chars,
+    ]
+    .iter()
+    .all(|v| !v);
+
+    let (lines, words, bytes, chars) = if is_args_empty {
+        (true, true, true, false)
     } else {
-        // オプションが指定なしの場合はデフォルト値を渡す
-        Ok(Config {
-            files: cli.files,
-            lines: true,
-            words: true,
-            bytes: true,
-            chars: false,
-        })
-    }
+        (
+            cli.lines,
+            cli.words,
+            cli.count_type.bytes,
+            cli.count_type.chars,
+        )
+    };
+
+    Ok(Config {
+        files: cli.files,
+        lines,
+        words,
+        bytes,
+        chars,
+    })
 }
 
 pub fn run(config: Config) -> MyResult<()> {
@@ -56,15 +60,15 @@ struct Cli {
     files: Vec<String>,
 
     #[command(flatten)]
-    count_type: Option<CountType>,
+    count_type: CountType,
 
     /// Show line count
     #[arg(short, long)]
-    lines: Option<bool>,
+    lines: bool,
 
     /// Show word count
     #[arg(short, long)]
-    words: Option<bool>,
+    words: bool,
 }
 
 #[derive(Args, Debug)]
@@ -72,11 +76,11 @@ struct Cli {
 struct CountType {
     /// Show byte count
     #[arg(short('c'), long)]
-    bytes: Option<bool>,
+    bytes: bool,
 
     /// Show character count
     #[arg(short('m'), long)]
-    chars: Option<bool>,
+    chars: bool,
 }
 
 #[cfg(test)]
@@ -91,6 +95,4 @@ mod test {
         Cli::command().debug_assert();
         Ok(())
     }
-
-    // TODO: Cli => Configするテストを書く
 }
